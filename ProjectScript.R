@@ -14,6 +14,10 @@ rm(list=ls())
 # Load libraries  
 library(readr)
 library(dplyr)
+library(ggplot2)
+
+
+
 # Read CSV Files
 bikes <- read_csv("PBType.csv")
 accident <- read_csv("accident.csv")
@@ -93,3 +97,18 @@ levels(df$CF1) <- c("None", "Reflected Glare","Motor Vehicle Struck by Falling C
 levels(df$CF2) <- c("None", "Non-Occupant Struck Vehicle", "Unknown")
 levels(df$CF3) <- c("None", "Unknown")
 
+df <- subset(df, HOUR != 99)
+df <- subset(df, BIKECTYPE != 0)
+df <- subset(df, LONGITUD < 200)
+df <- subset(df, LATITUDE < 60)
+
+
+qplot(HOUR, BIKECTYPE, data = df, geom = "point", facets = . ~ BIKELOC)
+qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
+qplot(BIKECTYPE, data = df, geom = "bar")
+qplot(HOUR, data = df, geom = "histogram", binwidth = 4)
+qplot(BIKECTYPE, BIKEDIR, data = df, geom = "point", size = HOUR)
+qplot(LATITUDE, LONGITUD, data = df, color = BIKEDIR, size = HOUR)
+qplot(BIKEDIR, data = df, geom = "bar")
+qplot(HOUR, data = df, geom = "density", facets = . ~ BIKEDIR)
+qplot(BIKECGP, data = df, geom = "bar")
