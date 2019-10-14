@@ -97,6 +97,74 @@ levels(df$CF1) <- c("None", "Reflected Glare","Motor Vehicle Struck by Falling C
 levels(df$CF2) <- c("None", "Non-Occupant Struck Vehicle", "Unknown")
 levels(df$CF3) <- c("None", "Unknown")
 
+print(levels(df$BIKECTYPE))
+
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Turning Error - Left Turn"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Turning Error - Right Turn"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Turning Error - Left Turn"] <- "Bicyclist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Turning Error - Right Turn"] <- "Bicyclist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Lost Control - Oversteering, Improper Braking, Speed"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Lost Control - Alcohol/Drug Impairment"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Lost Control - Alcohol/Drug Impairment"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Lost Control - Surface Conditions"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Lost Control - Other/Unknown"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Lost Control - Mechanical Problems"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Lost Control - Oversteering, Improper Braking, Speed"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Lost Control - Alcohol/Drug Impairment"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Lost Control - Other/Unknown"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Drive-Out - Sign-Controlled Intersection"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Out - Sign-Controlled Intersection"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Drive-Through - Sign-Controlled Intersection"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Through - Sign-Controlled Intersection"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Sign-Controlled Intersection - Other/Unknown"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Drive-Out - Right Turn on Red"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist - Ride-Out - Signalized Intersection"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Drive-Through - Signalized Intersection"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Through - Signalized Intersection"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Failed to Clear - Trapped"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Signalized Intersection - Other/Unknown"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Failed to Clear - Unknown"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Crossing Paths - Uncontrolled Intersection"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Crossing Paths - Intersection - Other/Unknown"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Left Turn - Same Direction"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Left Turn - Opposite Direction"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Right Turn - Same Direction"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Right Turn - Opposite Direction"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Right Turn on Red - Same Direction"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Turn/Merge - Other/Unknown"] <- "Motorist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Left Turn - Same Direction"] <- "Bicyclist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Left Turn - Opposite Direction"] <- "Bicyclist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Right Turn - Same Direction"] <- "Bicyclist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Right Turn - Opposite Direction"] <- "Bicyclist Turning Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-out - Parallel Path"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Undetected Bicyclist"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Misjudged Space"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Bicyclist Swerved"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Other/Unknown"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Passing on Right"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Passing on Left"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Other/Unknown"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Wrong-Way/Wrong-Side - Bicyclist"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Wrong-Way/Wrong-Side - Motorist"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Wrong-Way/Wrong-Side - Unknown"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Parallel Paths - Other/Unknown"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Out - Residential Driveway"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Out - Commercial Driveway"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Out - Driveway, Unknown Type"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Out - Other Midblock"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-Out - Unknown"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Drive-Out - Commercial Driveway"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Drive-Out - Driveway, Unknown Type"] <- "Motorist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Crossing Paths - Midblock - Other/Unknown"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Backing Vehicle"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Play Vehicle-Related"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Unusual Circumstances"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Non-Trafficway"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Unknown Approach Paths"] <- "Other"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Unknown Location"] <- "Other"
+
+print(levels(df$BIKECTYPE))
+
 df <- subset(df, HOUR != 99)
 df <- subset(df, BIKECTYPE != 0)
 df <- subset(df, LONGITUD < 200)
@@ -115,3 +183,4 @@ qplot(BIKECGP, data = df, geom = "bar")
 qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
       ylim = c(25, 50), na.rm = TRUE)
 qplot(BIKECGP, HOUR, data = df, geom = "jitter")
+
