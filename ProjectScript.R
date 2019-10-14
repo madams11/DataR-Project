@@ -112,3 +112,6 @@ qplot(LATITUDE, LONGITUD, data = df, color = BIKEDIR, size = HOUR)
 qplot(BIKEDIR, data = df, geom = "bar")
 qplot(HOUR, data = df, geom = "density", facets = . ~ BIKEDIR)
 qplot(BIKECGP, data = df, geom = "bar")
+qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
+      ylim = c(25, 50), na.rm = TRUE)
+qplot(BIKECGP, HOUR, data = df, geom = "jitter")
