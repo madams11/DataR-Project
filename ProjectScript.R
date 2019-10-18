@@ -16,8 +16,6 @@ library(readr)
 library(dplyr)
 library(ggplot2)
 
-
-
 # Read CSV Files
 bikes <- read_csv("PBType.csv")
 accident <- read_csv("accident.csv")
@@ -137,13 +135,13 @@ levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Left Turn - Opposite Dir
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Right Turn - Same Direction"] <- "Bicyclist Turning Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Right Turn - Opposite Direction"] <- "Bicyclist Turning Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Ride-out - Parallel Path"] <- "Bicyclist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Undetected Bicyclist"] <- "Motorist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Misjudged Space"] <- "Motorist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Bicyclist Swerved"] <- "Motorist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Other/Unknown"] <- "Motorist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Passing on Right"] <- "Bicyclist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Passing on Left"] <- "Bicyclist Error"
-levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Other/Unknown"] <- "Bicyclist Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Undetected Bicyclist"] <- "Motorist Passing Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Misjudged Space"] <- "Motorist Passing Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Bicyclist Swerved"] <- "Motorist Passing Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Overtaking - Other/Unknown"] <- "Motorist Passing Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Passing on Right"] <- "Bicyclist Passing Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Passing on Left"] <- "Bicyclist Passing Error"
+levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Overtaking - Other/Unknown"] <- "Bicyclist Passing Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Wrong-Way/Wrong-Side - Bicyclist"] <- "Bicyclist Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Wrong-Way/Wrong-Side - Motorist"] <- "Motorist Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Wrong-Way/Wrong-Side - Unknown"] <- "Other"
@@ -165,22 +163,55 @@ levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Unknown Location"] <- "Other"
 
 print(levels(df$BIKECTYPE))
 
+# Removing Unknowns
 df <- subset(df, HOUR != 99)
 df <- subset(df, BIKECTYPE != 0)
 df <- subset(df, LONGITUD < 200)
 df <- subset(df, LATITUDE < 60)
+df <- subset(df, PBAGE < 120)
 
 
-qplot(HOUR, BIKECTYPE, data = df, geom = "point", facets = . ~ BIKELOC)
-qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
+
+
+
+# KEEP THIS ONE (First Graph)
+# Frequency Chart by Crash Type
+#  figure out how to sort by frequency
 qplot(BIKECTYPE, data = df, geom = "bar")
-qplot(HOUR, data = df, geom = "histogram", binwidth = 4)
-qplot(BIKECTYPE, BIKEDIR, data = df, geom = "point", size = HOUR)
-qplot(LATITUDE, LONGITUD, data = df, color = BIKEDIR, size = HOUR)
-qplot(BIKEDIR, data = df, geom = "bar")
-qplot(HOUR, data = df, geom = "density", facets = . ~ BIKEDIR)
-qplot(BIKECGP, data = df, geom = "bar")
+
+# Frequency by Hour (2nd Graph) -Jodie
+#   Insert new column to change time of day to factor. 
+#4-6: Early Morning; 7-10: Morning; 11-2: Midday; 3-6: Afternoon; 7-9: Evening; 10-3: Overnight)
+qplot(HOUR, data = df, geom = "bar")
+
+# Choropleth Map
+#Opt 2
 qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
       ylim = c(25, 50), na.rm = TRUE)
+
+# KEEP THIS ONE
+# Direction of traffic and urban vs rural
+#   Pick a color pallette 
+#   null the Traffic Way not in State Inventory and Not Reported
+qplot(BIKEDIR, data = df, geom = "bar", fill=RUR_URB)
+
+# KEEP THIS ONE
+# Time of Day, Direction of Travel, and Rural vs Urban
+# null the Traffic Way not in State Inventory and Not Reported
+qplot(HOUR, data = df, geom = "bar", binwidth=4, facets = . ~ BIKEDIR, fill=RUR_URB)
+
+
+
+
+#unused
+qplot(BIKECTYPE, BIKEDIR, data = df, geom = "point", size = HOUR)
+
+##Use this to look at a certain bike crash type. the bike crash group is even more detail 
+qplot(BIKECGP, data = df, geom = "bar")
 qplot(BIKECGP, HOUR, data = df, geom = "jitter")
 
+# Type of Error, and Where the Crash Occurred
+qplot(BIKECTYPE, data = df, geom = "bar",fill=BIKELOC)
+
+# Time of Crash, Type of Error, and Where the Crash Occurred. different view
+qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
