@@ -171,7 +171,7 @@ df <- subset(df, LATITUDE < 60)
 df <- subset(df, PBAGE < 120)
 
 # Add new column for time of day
-df$TIME <- as.character(df$HOUR)
+df$TIME <- df$HOUR
 
 # Define buckets of time based on the hour
 mat0 <- df$HOUR >= 4 & df$HOUR < 7   # Will be set to Early Morning (4am to 6am)
@@ -179,7 +179,7 @@ mat1 <- df$HOUR >= 7 & df$HOUR < 11  # Will be set to Morning (7am to 10am)
 mat2 <- df$HOUR >= 11 & df$HOUR < 15  # Will be set to Midday (11am to 2pm)
 mat3 <- df$HOUR >= 15 & df$HOUR < 19  # Will be set to Afternoon (3pm to 6pm)
 mat4 <- df$HOUR >= 19 & df$HOUR < 22  # Will be set to Evening (7pm to 9pm)
-mat5 <- df$HOUR >= 22 & df$HOUR < 4  # Will be set to Overnight (10pm to 3am)
+mat5 <- df$HOUR >= 22 | df$HOUR < 4  # Will be set to Overnight (10pm to 3am)
 
 # Translate new column to the bucketed times of day
 df$TIME[mat0] <- "Early Morning"
@@ -189,6 +189,11 @@ df$TIME[mat3] <- "Afternoon"
 df$TIME[mat4] <- "Evening"
 df$TIME[mat5] <- "Overnight"
 
+# Set new column to factor, and set order
+df$TIME <- factor(df$TIME, levels = c("Early Morning", "Morning", "Midday", 
+                                      "Afternoon", "Evening", "Overnight"))
+
+
 
 # KEEP THIS ONE (First Graph)
 # Frequency Chart by Crash Type
@@ -196,9 +201,12 @@ df$TIME[mat5] <- "Overnight"
 qplot(BIKECTYPE, data = df, geom = "bar")
 
 # Frequency by Hour (2nd Graph) -Jodie
-#   Insert new column to change time of day to factor. 
+#   Insert new column to change time of day to factor. Has been added, named as TIME
 #4-6: Early Morning; 7-10: Morning; 11-2: Midday; 3-6: Afternoon; 7-9: Evening; 10-3: Overnight)
 qplot(HOUR, data = df, geom = "bar")
+
+# Adjusted version of plot above using new TIME column
+qplot(TIME, data = df, geom = "bar")
 
 # Choropleth Map
 #Opt 2
@@ -216,7 +224,8 @@ qplot(BIKEDIR, data = df, geom = "bar", fill=RUR_URB)
 # null the Traffic Way not in State Inventory and Not Reported
 qplot(HOUR, data = df, geom = "bar", binwidth=4, facets = . ~ BIKEDIR, fill=RUR_URB)
 
-
+#copy of above, but with new TIME column
+qplot(TIME, data = df, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
 
 
 #unused
