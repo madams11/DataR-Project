@@ -170,8 +170,24 @@ df <- subset(df, LONGITUD < 200)
 df <- subset(df, LATITUDE < 60)
 df <- subset(df, PBAGE < 120)
 
+# Add new column for time of day
+df$TIME <- as.character(df$HOUR)
 
+# Define buckets of time based on the hour
+mat0 <- df$HOUR >= 4 & df$HOUR < 7   # Will be set to Early Morning (4am to 6am)
+mat1 <- df$HOUR >= 7 & df$HOUR < 11  # Will be set to Morning (7am to 10am)
+mat2 <- df$HOUR >= 11 & df$HOUR < 15  # Will be set to Midday (11am to 2pm)
+mat3 <- df$HOUR >= 15 & df$HOUR < 19  # Will be set to Afternoon (3pm to 6pm)
+mat4 <- df$HOUR >= 19 & df$HOUR < 22  # Will be set to Evening (7pm to 9pm)
+mat5 <- df$HOUR >= 22 & df$HOUR < 4  # Will be set to Overnight (10pm to 3am)
 
+# Translate new column to the bucketed times of day
+df$TIME[mat0] <- "Early Morning"
+df$TIME[mat1] <- "Morning"
+df$TIME[mat2] <- "Midday"
+df$TIME[mat3] <- "Afternoon"
+df$TIME[mat4] <- "Evening"
+df$TIME[mat5] <- "Overnight"
 
 
 # KEEP THIS ONE (First Graph)
