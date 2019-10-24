@@ -81,7 +81,7 @@ levels(df$BIKEPOS) <- c("Travel Lane", "Bicycle Lane", "Sidewalk", "Non-Trafficw
 levels(df$BIKEDIR) <- c("With Traffic", "Facing Traffic", "Not Applicable","Unknown")
 levels(df$BIKECGP) <- c("Loss of Control/Turning Error","Motorist Failed to Yield - Sign-Controlled Intersection","Bicyclist Failed to Yield - Sign-Controlled Intersection","Motorist Failed to Yield - Signalized Intersection","Bicyclist Failed to Yield - Signalized Intersection","Crossing Paths - Other Circumstances","Motorist Left Turn/Merge","Motorist Right Turn/Merge","Bicyclist Left Turn/Merge","Bicyclist Right Turn/Merge","Motorist Overtaking Bicyclist","Bicyclist Overtaking Motorist","Wrong-Way/Wrong-Side","Parallel Paths - Other Circumstances","Bicyclist Failed to Yield - Midblock","Motorist Failed to Yield - Midblock","Backing Vehicle","Other/Unusual Circumstances","Non-Trafficway","Other/Unknown - Insufficient Details")
 levels(df$DAY_WEEK) <- c("Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
-levels(df$RUR_URB) <- c("Rural","Urban","Trafficway not in State Inventory", "Not Reported", "Unknown")
+levels(df$RUR_URB) <- c("Rural","Urban","", "", "")
 levels(df$FUNC_SYS) <- c("Interstate", "Other Freeways and Expressways", "Other", "Minor Arterial","Major Collector", "Minor Collector", "Local", "Trafficway not in State Inventory", "Not Reported", "Unknown")
 levels(df$HARM_EV) <- c("Overturn", "Pedalcycle", "Animal", "Other Type Non-Motorist", "Guard Rail", "Impact Attenuator", "Passing Over Bridge or Overpass","Mail Box")
 levels(df$MAN_COLL) <- c("Not a Collision with Motor Vehicle in Transport", "Sideswipe - Opposite Direction", "Sideswipe - Same Direction")
@@ -171,6 +171,7 @@ df <- subset(df, BIKECTYPE != 0)
 df <- subset(df, LONGITUD < 200)
 df <- subset(df, LATITUDE < 60)
 df <- subset(df, PBAGE < 120)
+df <- subset(df, RUR_URB != "")
 
 # Add new column for time of day
 df$TIME <- df$HOUR
