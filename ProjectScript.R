@@ -15,6 +15,8 @@ rm(list=ls())
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(choroplethr)
+library(choroplethrMaps)
 
 # Read CSV Files
 bikes <- read_csv("PBType.csv")
@@ -209,9 +211,34 @@ qplot(HOUR, data = df, geom = "bar")
 qplot(TIME, data = df, geom = "bar")
 
 # Choropleth Map
-#Opt 2
-qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
-      ylim = c(25, 50), na.rm = TRUE)
+mapdf <- group_by(df, STATE.x)
+summ <- summarize(mapdf, value=n())
+summ$region <- tolower(summ$STATE.x)
+data("state.regions")
+st <- state.regions
+st$region <- factor(st$region)
+summ <- summ[order(tolower(summ$region)), ]
+
+new <- semi_join(st, summ)
+new$value <- summ$value
+
+p <- state_choropleth(new,new$value)
+p
+
+#Top 5 States Table
+top5state <- group_by(df, STATE.x)
+top5state <- summarize(top5state, Number_of_Fatalities=n())
+top5state <- top5state[order(top5state$Number_of_Fatalities, decreasing = TRUE), ]
+top5state <- head(top5state,n=5)
+top5state$STATE.x <- as.character(top5state$STATE.x)
+top5state$STATE.x <- factor(top5state$STATE.x)
+top5state <- arrange(desc(top5state$Number_of_Fatalities))
+  
+top5state
+
+#Top 5 States Graph
+
+ggplot(top5state,mapping=aes_(y=top5state$Number_of_Fatalities, x=top5state$STATE.x))+ geom_bar(stat="identity")
 
 # KEEP THIS ONE
 # Direction of traffic and urban vs rural
@@ -240,3 +267,6 @@ qplot(BIKECTYPE, data = df, geom = "bar",fill=BIKELOC)
 
 # Time of Crash, Type of Error, and Where the Crash Occurred. different view
 qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
+
+qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
+      ylim = c(25, 50), na.rm = TRUE)
