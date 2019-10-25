@@ -1,6 +1,9 @@
 library(tidyverse)
 library(lubridate)
-library(ggcal)
+library(ggmap)
+library(ggTimeSeries)
+library(leaflet)
+library(leaflet.extras)
 
 df <- read_csv("bikeaccidents.csv") %>% filter(BIKECTYPE != 0)
 names(df)
@@ -23,7 +26,7 @@ names(df)
 df$MONTH_NAME <- factor(month.name[df$MONTH], levels = rev(month.name))
 df$DATE <- ymd(paste0(df$YEAR,"-",df$MONTH,"-",df$DAY))
 df$DAY_NAME <- wday(df$DATE,label = T,abbr = F)
-
+df$STATE_NAME <- state.name[df$STATE.x]
 # This didn't really yield much
 ggplot(df, 
        aes(x = MONTH_NAME, 
@@ -84,9 +87,54 @@ ggsave("./plots/day_hour_month.png", width = 8, units = "in")
 
 # Calendar View -----------------------------------------------------------
 
-ggcal(df %>% 
-        filter(HOUR < 24) %>%
-        group_by(DAY_NAME, 
-                 HOUR, 
-                 MONTH_NAME) %>%
-        summarise(n = n()), myfills2)
+ggplot_calendar_heatmap(
+  df %>% 
+    filter(HOUR < 24) %>%
+    group_by(DATE) %>%
+    summarise(n = n()),
+  'DATE',
+  'n'
+) + theme(legend.position = "right",
+        legend.direction = "vertical") + 
+  ylab("Day of Week") + 
+  scale_fill_viridis_c(na.value = "black")
+ggsave("./plots/calendar.png", width = 8, height = 2, units = "in")
+
+
+# Map ---------------------------------------------------------------------
+# US
+register_google(key = "API_KEY_DO_NOT_PUBLISH")
+map_US <- get_map(location='united states', zoom=4, maptype = 'terrain')
+ggmap(map_US)
+ggmap(map_US) +
+  stat_density2d(data = df, aes(x = LONGITUD, y = LATITUDE, fill = ..density..), 
+                 geom = 'tile', contour = F, alpha = .6) +  
+  scale_fill_viridis_c(option = 'inferno')
+ggsave("./plots/united-states.png", width = 8, units = "in")
+
+# Specific States (CA)
+map_CA <- get_map(location='California', zoom=6, maptype = 'terrain')
+ggmap(map_CA)
+ggmap(map_CA) +
+  stat_density2d(data = df, aes(x = LONGITUD, y = LATITUDE, fill = ..density..), 
+                 geom = 'tile', contour = F, alpha = .6) +  
+  scale_fill_viridis_c(option = 'inferno')
+ggsave("./plots/california.png", width = 8, units = "in")
+
+# Specific States (FL)
+map_FL <- get_map(location='Clearwater, FL', zoom=7, maptype = 'terrain')
+ggmap(map_FL)
+ggmap(map_FL) +
+  stat_density2d(data = df, aes(x = LONGITUD, y = LATITUDE, fill = ..density..), 
+                 geom = 'tile', contour = F, alpha = .6) +  
+  scale_fill_viridis_c(option = 'inferno')
+ggsave("./plots/florida.png", width = 8, units = "in")
+
+
+# Leaflet -----------------------------------------------------------------
+
+# Possibly useful for exploratory phase
+leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(df$LONGITUD, df$LATITUDE, 
+             clusterOptions = markerClusterOptions())
