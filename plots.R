@@ -1,6 +1,8 @@
 library(tidyverse)
 library(lubridate)
-df <- read_csv("bikeaccidents.csv")
+library(ggcal)
+
+df <- read_csv("bikeaccidents.csv") %>% filter(BIKECTYPE != 0)
 names(df)
 # [1] "STATE.x"    "ST_CASE"    "VEH_NO"     "PER_NO"     "PBPTYPE"    "PBAGE"     
 # [7] "PBSEX"      "PBCWALK"    "PBSWALK"    "PBSZONE"    "PEDCTYPE"   "BIKECTYPE" 
@@ -19,7 +21,8 @@ names(df)
 
 # Set up additional columns -----------------------------------------------
 df$MONTH_NAME <- factor(month.name[df$MONTH], levels = rev(month.name))
-df$DAY_NAME <- wday(paste0(df$YEAR,"-",df$MONTH,"-",df$DAY),label = T,abbr = F)
+df$DATE <- ymd(paste0(df$YEAR,"-",df$MONTH,"-",df$DAY))
+df$DAY_NAME <- wday(df$DATE,label = T,abbr = F)
 
 # This didn't really yield much
 ggplot(df, 
@@ -29,7 +32,6 @@ ggplot(df,
   geom_bar() + coord_flip() + facet_wrap(~DAY_NAME)
 
 # Drop Hour 99 data
-# This didn't really yield much
 ggplot(df %>% filter(HOUR < 24), 
        aes(x = DAY_NAME, 
            fill = HOUR, 
@@ -55,11 +57,11 @@ ggplot(df %>%
   ylab("Hour of Day") +
   ggtitle("Number of Observations by Day of Week and Hour of Day") +
   scale_fill_viridis_c(na.value = "black")
-ggsave("day_hour.png", width = 8, units = "in")
+ggsave("./plots/day_hour.png", width = 8, units = "in")
 
 # Seperate by Month -------------------------------------------------------
 
-
+# Showcases how little data there is
 ggplot(df %>% 
          filter(HOUR < 24) %>%
          group_by(DAY_NAME, 
@@ -77,4 +79,14 @@ ggplot(df %>%
   ylab("Hour of Day") +
   ggtitle("Number of Observations by Day of Week and Hour of Day") +
   scale_fill_viridis_c(na.value = "black")
-ggsave("day_hour_month.png", width = 8, units = "in")
+ggsave("./plots/day_hour_month.png", width = 8, units = "in")
+
+
+# Calendar View -----------------------------------------------------------
+
+ggcal(df %>% 
+        filter(HOUR < 24) %>%
+        group_by(DAY_NAME, 
+                 HOUR, 
+                 MONTH_NAME) %>%
+        summarise(n = n()), myfills2)
