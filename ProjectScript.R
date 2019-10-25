@@ -239,13 +239,15 @@ top5state
 
 #Top 5 States Graph
 
+top5state$STATE.x <- factor(top5state$STATE.x, levels=top5state[[1]])
 ggplot(top5state,mapping=aes_(y=top5state$Number_of_Fatalities, x=top5state$STATE.x))+ geom_bar(stat="identity")
 
 # KEEP THIS ONE
 # Direction of traffic and urban vs rural
 #   Pick a color pallette 
-#   null the Traffic Way not in State Inventory and Not Reported
-qplot(BIKEDIR, data = df, geom = "bar", fill=RUR_URB)
+p <- qplot(BIKEDIR, data = df, geom = "bar", fill=RUR_URB)
+p <- p + theme(axis.text.x = element_text(angle = 45))
+p
 
 # KEEP THIS ONE
 # Time of Day, Direction of Travel, and Rural vs Urban
@@ -256,15 +258,18 @@ qplot(HOUR, data = df, geom = "bar", binwidth=4, facets = . ~ BIKEDIR, fill=RUR_
 qplot(TIME, data = df, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
 
 
-#unused
-qplot(BIKECTYPE, BIKEDIR, data = df, geom = "point", size = HOUR)
 
 ##Use this to look at a certain bike crash type. the bike crash group is even more detail 
-qplot(BIKECGP, data = df, geom = "bar")
-qplot(BIKECGP, HOUR, data = df, geom = "jitter")
+p <- qplot(BIKECTYPE, data = df, geom = "bar")
+p <- p + theme(axis.text.x = element_text(angle = 45))
+p
+
 
 # Type of Error, and Where the Crash Occurred
-qplot(BIKECTYPE, data = df, geom = "bar",fill=BIKELOC)
+p <- qplot(BIKECTYPE, data = df, geom = "bar",fill=BIKELOC)
+p  <- p + theme(legend.position = "bottom")
+p <- p + theme(axis.text.x = element_text(angle = 45))
+p
 
 # Time of Crash, Type of Error, and Where the Crash Occurred. different view
 qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
