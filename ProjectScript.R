@@ -203,12 +203,12 @@ df$TIME <- factor(df$TIME, levels = c("Early Morning", "Morning", "Midday",
 #  figure out how to sort by frequency
 qplot(BIKECTYPE, data = df, geom = "bar")
 
-# Frequency by Hour (2nd Graph) -Jodie
+# Frequency by Hour (2nd Graph) - Jodie
 #   Insert new column to change time of day to factor. Has been added, named as TIME
 #4-6: Early Morning; 7-10: Morning; 11-2: Midday; 3-6: Afternoon; 7-9: Evening; 10-3: Overnight)
 qplot(HOUR, data = df, geom = "bar")
 
-# Adjusted version of plot above using new TIME column
+# Adjusted version of plot above using new TIME column - Jodie (likely will use this instead of above one)
 qplot(TIME, data = df, geom = "bar")
 
 # Choropleth Map
@@ -254,7 +254,7 @@ p
 # null the Traffic Way not in State Inventory and Not Reported
 qplot(HOUR, data = df, geom = "bar", binwidth=4, facets = . ~ BIKEDIR, fill=RUR_URB)
 
-#copy of above, but with new TIME column
+#copy of above, but with new TIME column - Jodie (will use this one instead of above)
 qplot(TIME, data = df, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
 
 
