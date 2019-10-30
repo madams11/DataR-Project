@@ -242,6 +242,11 @@ top5state
 top5state$STATE.x <- factor(top5state$STATE.x, levels=top5state[[1]])
 ggplot(top5state,mapping=aes_(y=top5state$Number_of_Fatalities, x=top5state$STATE.x))+ geom_bar(stat="identity")
 
+#Weather 
+
+qplot(WEATHER, data = df, geom = "bar")
+ggplot(WEATHER,data = df, geom = "bar", mapping = aes(y=top5state$WEATHER, x=top5state$STATE.x))
+
 # KEEP THIS ONE
 # Direction of traffic and urban vs rural
 #   Pick a color pallette 
