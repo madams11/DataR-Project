@@ -78,7 +78,7 @@ levels(df$PBSZONE) <- c("None", "Yes", "Unknown")
 levels(df$BIKECTYPE) <- c("Motorist Turning Error - Left Turn","Motorist Turning Error - Right Turn","Bicyclist Turning Error - Left Turn","Bicyclist Turning Error - Right Turn","Bicyclist Lost Control - Oversteering, Improper Braking, Speed","Bicyclist Lost Control - Alcohol/Drug Impairment","Bicyclist Lost Control - Surface Conditions","Bicyclist Lost Control - Other/Unknown","Motorist Lost Control - Mechanical Problems","Motorist Lost Control - Oversteering, Improper Braking, Speed","Motorist Lost Control - Alcohol/Drug Impairment","Motorist Lost Control - Other/Unknown","Motorist Drive-Out - Sign-Controlled Intersection","Bicyclist Ride-Out - Sign-Controlled Intersection","Motorist Drive-Through - Sign-Controlled Intersection","Bicyclist Ride-Through - Sign-Controlled Intersection","Sign-Controlled Intersection - Other/Unknown","Motorist Drive-Out - Right Turn on Red","Bicyclist - Ride-Out - Signalized Intersection","Motorist Drive-Through - Signalized Intersection","Bicyclist Ride-Through - Signalized Intersection","Bicyclist Failed to Clear - Trapped","Signalized Intersection - Other/Unknown","Bicyclist Failed to Clear - Unknown","Crossing Paths - Uncontrolled Intersection","Crossing Paths - Intersection - Other/Unknown","Motorist Left Turn - Same Direction","Motorist Left Turn - Opposite Direction","Motorist Right Turn - Same Direction","Motorist Right Turn - Opposite Direction","Motorist Right Turn on Red - Same Direction","Motorist Turn/Merge - Other/Unknown","Bicyclist Left Turn - Same Direction","Bicyclist Left Turn - Opposite Direction","Bicyclist Right Turn - Same Direction","Bicyclist Right Turn - Opposite Direction","Bicyclist Ride-out - Parallel Path","Motorist Overtaking - Undetected Bicyclist","Motorist Overtaking - Misjudged Space","Motorist Overtaking - Bicyclist Swerved","Motorist Overtaking - Other/Unknown","Bicyclist Overtaking - Passing on Right","Bicyclist Overtaking - Passing on Left","Bicyclist Overtaking - Other/Unknown","Wrong-Way/Wrong-Side - Bicyclist","Wrong-Way/Wrong-Side - Motorist","Wrong-Way/Wrong-Side - Unknown","Parallel Paths - Other/Unknown","Bicyclist Ride-Out - Residential Driveway","Bicyclist Ride-Out - Commercial Driveway","Bicyclist Ride-Out - Driveway, Unknown Type","Bicyclist Ride-Out - Other Midblock","Bicyclist Ride-Out - Unknown","Motorist Drive-Out - Commercial Driveway","Motorist Drive-Out - Driveway, Unknown Type","Crossing Paths - Midblock - Other/Unknown","Backing Vehicle","Play Vehicle-Related","Unusual Circumstances","Non-Trafficway","Unknown Approach Paths","Unknown Location")
 levels(df$BIKELOC) <- c("At Intersection", "Intersection-Related","Not at Intersection", "Non-Trafficway Location","Unknown")
 levels(df$BIKEPOS) <- c("Travel Lane", "Bicycle Lane", "Sidewalk", "Non-Trafficway-Parking Lot","Other", "Unknown")
-levels(df$BIKEDIR) <- c("With Traffic", "Facing Traffic", "Not Applicable","Unknown")
+levels(df$BIKEDIR) <- c("With Traffic", "Facing Traffic", "","")
 levels(df$BIKECGP) <- c("Loss of Control/Turning Error","Motorist Failed to Yield - Sign-Controlled Intersection","Bicyclist Failed to Yield - Sign-Controlled Intersection","Motorist Failed to Yield - Signalized Intersection","Bicyclist Failed to Yield - Signalized Intersection","Crossing Paths - Other Circumstances","Motorist Left Turn/Merge","Motorist Right Turn/Merge","Bicyclist Left Turn/Merge","Bicyclist Right Turn/Merge","Motorist Overtaking Bicyclist","Bicyclist Overtaking Motorist","Wrong-Way/Wrong-Side","Parallel Paths - Other Circumstances","Bicyclist Failed to Yield - Midblock","Motorist Failed to Yield - Midblock","Backing Vehicle","Other/Unusual Circumstances","Non-Trafficway","Other/Unknown - Insufficient Details")
 levels(df$DAY_WEEK) <- c("Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
 levels(df$RUR_URB) <- c("Rural","Urban","", "", "")
@@ -172,6 +172,7 @@ df <- subset(df, LONGITUD < 200)
 df <- subset(df, LATITUDE < 60)
 df <- subset(df, PBAGE < 120)
 df <- subset(df, RUR_URB != "")
+df <- subset(df, BIKEDIR != "")
 
 # Add new column for time of day
 df$TIME <- df$HOUR
@@ -209,7 +210,37 @@ qplot(BIKECTYPE, data = df, geom = "bar")
 qplot(HOUR, data = df, geom = "bar")
 
 # Adjusted version of plot above using new TIME column - Jodie (likely will use this instead of above one)
-qplot(TIME, data = df, geom = "bar")
+acc_time <- qplot(TIME, data = df, geom = "bar", 
+                  fill = I("darkblue"), 
+                  color = I("greenyellow"), 
+                  alpha = I(0.8))
+acc_time <- acc_time + scale_x_discrete(name = "Time of Day")
+acc_time <- acc_time + ylab("Number of Fatalities")
+acc_time <- acc_time + theme(panel.grid.minor.y = element_blank())
+acc_time <- acc_time + theme(panel.grid.major.x = element_blank())
+acc_time <- acc_time + theme(panel.grid.minor.x = element_blank())
+acc_time <- acc_time + theme(axis.ticks.x = element_blank())
+acc_time
+
+ggsave(filename = "Fatalities_by_Time.pdf", plot = acc_time, width = 6, height = 4,
+       units = "in")
+
+# Day of week graph
+day <- qplot(DAY_WEEK, data = df, geom = "bar", 
+                  fill = I("darkblue"), 
+                  color = I("greenyellow"), 
+                  alpha = I(0.8))
+day <- day + scale_x_discrete(name = "Day of the Week")
+day <- day + ylab("Number of Fatalities")
+day <- day + theme(panel.grid.minor.y = element_blank())
+day <- day + theme(panel.grid.major.x = element_blank())
+day <- day + theme(panel.grid.minor.x = element_blank())
+day <- day + theme(axis.ticks.x = element_blank())
+day
+
+ggsave(filename = "Fatalities_by_Day.pdf", plot = day, width = 6, height = 4,
+       units = "in")
+
 
 # Choropleth Map
 mapdf <- group_by(df, STATE.x)
@@ -260,8 +291,16 @@ p
 qplot(HOUR, data = df, geom = "bar", binwidth=4, facets = . ~ BIKEDIR, fill=RUR_URB)
 
 #copy of above, but with new TIME column - Jodie (will use this one instead of above)
-qplot(TIME, data = df, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
+#Filter out the BIKEDIR = Not Applicable, Unknown
+time_dir <- qplot(TIME, data = df, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
+time_dir <- time_dir + scale_fill_manual(name = "Location", values = c("darkblue", "greenyellow"))
+time_dir <- time_dir + scale_x_discrete(name = "Time of Day")
+time_dir <- time_dir + ylab("Number of Fatalities")
+time_dir <- time_dir + theme(axis.text.x = element_text(angle = 45))
+time_dir
 
+ggsave(filename = "Fatalities_by_Time_Dir_Urb.pdf", plot = time_dir, width = 6, height = 4,
+       units = "in")
 
 
 ##Use this to look at a certain bike crash type. the bike crash group is even more detail 
@@ -281,3 +320,18 @@ qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
 
 qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
       ylim = c(25, 50), na.rm = TRUE)
+
+
+# Possible function - returns count of fatalities for input state
+# Could expand to return counts for other types of data?
+# Could add in error handling
+state_cnt <- function(state){
+  state <- tolower(state)
+  df2 <- subset(df, state == tolower(df$STATE.x))
+  nrow(df2)
+}
+
+# Test function
+state_cnt("Iowa")
+state_cnt("California")
+state_cnt("Arizona")
