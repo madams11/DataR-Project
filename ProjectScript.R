@@ -351,15 +351,21 @@ st.codes <- data.frame(state = as.factor(c("AK", "AL", "AR", "AZ", "CA", "CO", "
                                           "Tennessee" , "Texas" , "Utah" ,  "Virginia","Vermont" ,
                                           "Washington" , "Wisconsin", "West Virginia" , "Wyoming")))
 my_error_handling <- function(st){
+  if(! st %in% st.codes$state){
+    error <- "Please enter a valid State or State Appreviation"
+    stop(error)
+  }
   rows <- grep(pattern = tolower(st), x = tolower(st.codes$state), fixed = TRUE)
-  state <- st.codes[[rows,2 ]]
+  state <- st.codes[[rows,"full"]]
   state <- as.character(state)
+  state
 }
 
 state_cnt <- function(state){
-  if(identical(tolower(state),df$STATE.x)==FALSE){
+  if((tolower(state) %in% tolower(df$STATE.x))=="FALSE"){
     state <- my_error_handling(state)
   }
+  
   state <- tolower(state)
   df2 <- subset(df, state == tolower(df$STATE.x))
   df2 <-count(df2, BIKECTYPE)
@@ -369,6 +375,7 @@ state_cnt <- function(state){
 # Test function
 state_cnt("Iowa")
 state_cnt("MN")
-state_cnt("Minnesota")
+state_cnt("Bob")
 state_cnt("California")
 state_cnt("Arizona")
+state_cnt("TX")
