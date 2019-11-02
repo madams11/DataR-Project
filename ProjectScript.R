@@ -274,10 +274,27 @@ ggsave(filename = "Fatalities_by_Time_Dir_Urb.pdf", plot = time_dir, width = 6, 
 
 # Frequency Chart by Crash Type - Brian
 df3 <- df
-df3$BIKECTYPE <- factor(df3$BIKECTYPE, levels=c("Motorist Passing Error","Bicyclist Error","Bicyclist Turning Error","Motorist Turning Error","Motorist Error","Bicyclist Passing Error","Other"))
-qplot(BIKECTYPE, data = df3, geom = "bar",fill = I("darkblue"), 
-      color = I("greenyellow"), 
-      alpha = I(0.8))
+df3 <- subset(df3, BIKECTYPE != "Other")
+df3$BIKECTYPE <- factor(df3$BIKECTYPE, levels=c("Motorist Passing Error","Bicyclist Error","Bicyclist Turning Error","Motorist Turning Error","Motorist Error","Bicyclist Passing Error"))
+crashtype <- qplot(BIKECTYPE, data = df3, geom = "bar",fill = I("darkblue"), alpha = I(0.8))
+crashtype <- crashtype + ylab("Number of Fatalities")
+crashtype <- crashtype + scale_x_discrete(name = "Crash Type")
+crashtype <- crashtype + theme(axis.text.x = element_text(angle = 45))
+crashtype
+
+# Frequency Chart by Sex of Rider - Brian
+df5 <- df
+df5 <- subset(df5, PBSEX != "Unknown")
+df5 <- subset(df5, PBSEX != "Not Reported")
+df5 <- subset(df5, BIKEDIR != "")
+
+pbsex_dir <- qplot(TIME, data = df5, geom = "bar", facets = . ~ BIKEDIR, fill=PBSEX)
+pbsex_dir <- pbsex_dir + scale_fill_manual(name = "Sex", values = c("darkblue", "greenyellow"))
+pbsex_dir <- pbsex_dir + scale_x_discrete(name = "Time of Day")
+pbsex_dir <- pbsex_dir + ylab("Number of Fatalities")
+pbsex_dir <- pbsex_dir + theme(axis.text.x = element_text(angle = 45))
+pbsex_dir
+
 
 #Weather - Sam
 df4 <- subset(df,df$WEATHER != "Not Reported")
