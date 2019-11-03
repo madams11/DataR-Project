@@ -195,6 +195,8 @@ df$TIME[mat5] <- "Overnight"
 df$TIME <- factor(df$TIME, levels = c("Early Morning", "Morning", "Midday", 
                                       "Afternoon", "Evening", "Overnight"))
 
+
+
 # Choropleth Map
 mapdf <- group_by(df, STATE.x)
 summ <- summarize(mapdf, value=n())
@@ -225,8 +227,9 @@ top5state <- arrange(desc(top5state$Number_of_Fatalities))
 top5state$STATE.x <- factor(top5state$STATE.x, levels=top5state[[1]])
 ggplot(top5state,mapping=aes_(y=top5state$Number_of_Fatalities, x=top5state$STATE.x))+ geom_bar(stat="identity")
 
-# Frequency by Hour (2nd Graph)  - Jodie 
-df_time <- subset(df, HOUR != 99)
+# Frequency by Time of Day - Jodie 
+## Exclude records for which time of day was not available (8 fatalities)
+df_time <- subset(df, HOUR != 99)  
 acc_time <- qplot(TIME, data = df_time, geom = "bar", 
                   fill = I("darkblue"), 
                   color = I("greenyellow"), 
@@ -242,7 +245,8 @@ acc_time
 ggsave(filename = "Fatalities_by_Time.pdf", plot = acc_time, width = 6, height = 4,
        units = "in")
 
-# Day of week graph
+
+# Day of week graph - Jodie
 day <- qplot(DAY_WEEK, data = df, geom = "bar", 
                   fill = I("darkblue"), 
                   color = I("greenyellow"), 
@@ -258,14 +262,13 @@ day
 ggsave(filename = "Fatalities_by_Day.pdf", plot = day, width = 6, height = 4,
        units = "in")
 
-# Time of Day of Crashes and Rural or Ruban location - Jodie
-df2 <- subset(df, RUR_URB != "")
-df2 <- subset(df2, BIKEDIR != "")
-
+# Time of Day of Crashes, Bike Direction, and Rural or Urban location - Jodie
 time_dir <- qplot(TIME, data = df2, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
 time_dir <- time_dir + scale_fill_manual(name = "Location", values = c("darkblue", "greenyellow"))
 time_dir <- time_dir + scale_x_discrete(name = "Time of Day")
 time_dir <- time_dir + ylab("Number of Fatalities")
+time_dir <- time_dir + theme(panel.grid.minor = element_blank())
+time_dir <- time_dir + theme(panel.grid.major.x = element_blank())
 time_dir <- time_dir + theme(axis.text.x = element_text(angle = 45))
 time_dir
 
@@ -314,7 +317,7 @@ p <- p + theme(axis.text.x = element_text(angle = 45))
 p
 
 
-
+# Other plots evaluated, but not included in final report
 
 # Direction of traffic and urban vs rural
 #   Pick a color pallette 
@@ -347,9 +350,23 @@ qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
 qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
       ylim = c(25, 50), na.rm = TRUE)
 
+# Bike Direction and Rural or Urban location
+df2 <- subset(df, RUR_URB != "")
+df2 <- subset(df2, BIKEDIR != "")
 
-# Possible function - returns count of fatalities for input state
-# Could expand to return counts for other types of data?
+dir_loc <- qplot(BIKEDIR, data = df2, geom = "bar", fill=RUR_URB)
+dir_loc <- dir_loc + scale_fill_manual(name = "Location", values = c("darkblue", "greenyellow"))
+dir_loc <- dir_loc + scale_x_discrete(name = "Bike Direction")
+dir_loc <- dir_loc + ylab("Number of Fatalities")
+dir_loc <- dir_loc + theme(panel.grid.minor = element_blank())
+dir_loc <- dir_loc + theme(panel.grid.major.x = element_blank())
+dir_loc
+
+ggsave(filename = "Fatalities_by_Dir_Urb.pdf", plot = time_dir, width = 6, height = 4,
+       units = "in")
+
+
+# Function - returns count of fatalities for input state
      # Reference state abbreviations for error handling.
 
 st.codes <- data.frame(state = as.factor(c("AK", "AL", "AR", "AZ", "CA", "CO", "CT", "DC", "DE", "FL", "GA", "HI",
