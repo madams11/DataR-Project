@@ -1,6 +1,7 @@
 #Group 4
+#Melanie Adams, Sam Etten, Jodie Carlson, Brian Rolf, Norean Gardner
 # Data Programming in R : Fall 2019
-# US Bicycle Fatalities
+# US Bicycle Fatalities - FARS 2017
 
 
 # Clear Workspace
@@ -14,6 +15,7 @@ rm(list=ls())
 #install.packages("ggplot2")
 #install.packages("choroplethr")
 #install.packages("choroplethrMaps")
+#install.packages("RColorBrewer")
 
 # Load libraries  
 library(readr)
@@ -21,6 +23,7 @@ library(dplyr)
 library(ggplot2)
 library(choroplethr)
 library(choroplethrMaps)
+library(RColorBrewer)
 
 # Read CSV Files
 bikes <- read_csv("PBType.csv")
@@ -102,7 +105,6 @@ levels(df$CF2) <- c("None", "Non-Occupant Struck Vehicle", "Unknown")
 levels(df$CF3) <- c("None", "Unknown")
 
 # Collapse Levels of Bicycle Crash Types
-
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Turning Error - Left Turn"] <- "Motorist Turning Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Motorist Turning Error - Right Turn"] <- "Motorist Turning Error"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Bicyclist Turning Error - Left Turn"] <- "Bicyclist Turning Error"
@@ -167,11 +169,6 @@ levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Non-Trafficway"] <- "Other"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Unknown Approach Paths"] <- "Other"
 levels(df$BIKECTYPE)[levels(df$BIKECTYPE) == "Unknown Location"] <- "Other"
 
-
-# Age of Victim - Norean
-
-# Sex of victim - Brian
-
 # Add new column for time of day
 df$TIME <- df$HOUR
 
@@ -195,22 +192,21 @@ df$TIME[mat5] <- "Overnight"
 df$TIME <- factor(df$TIME, levels = c("Early Morning", "Morning", "Midday", 
                                       "Afternoon", "Evening", "Overnight"))
 
-
-
 # Choropleth Map
-mapdf <- group_by(df, STATE.x)
-summ <- summarize(mapdf, value=n())
+dfmap <- group_by(df, STATE.x)
+summ <- summarize(dfmap, value=n())
 summ$region <- tolower(summ$STATE.x)
 data("state.regions")
 st <- state.regions
 st$region <- factor(st$region)
 summ <- summ[order(tolower(summ$region)), ]
 
-new <- semi_join(st, summ)
+new <- semi_join(summ, st)
 new$value <- summ$value
 
-p <- state_choropleth(new,new$value)
-ggsave(filename = "United_States_Map.png", plot = p, width = 12, height = 8,
+map <- state_choropleth(new,new$value)
+map
+ggsave(filename = "United_States_Map.jpeg", plot = map, width = 12, height = 8,
        units = "in")
 
 # Top 5 States Table
@@ -221,13 +217,10 @@ top5state <- head(top5state,n=5)
 top5state$STATE.x <- as.character(top5state$STATE.x)
 top5state$STATE.x <- factor(top5state$STATE.x)
 top5state <- arrange(desc(top5state$Number_of_Fatalities))
+print(top5state)
 
-# Top 5 States Graph
 
-top5state$STATE.x <- factor(top5state$STATE.x, levels=top5state[[1]])
-ggplot(top5state,mapping=aes_(y=top5state$Number_of_Fatalities, x=top5state$STATE.x))+ geom_bar(stat="identity")
-
-# Frequency by Time of Day - Jodie 
+# Frequency by Time of Day 
 ## Exclude records for which time of day was not available (8 fatalities)
 df_time <- subset(df, HOUR != 99)  
 acc_time <- qplot(TIME, data = df_time, geom = "bar", 
@@ -242,11 +235,11 @@ acc_time <- acc_time + theme(panel.grid.minor.x = element_blank())
 acc_time <- acc_time + theme(axis.ticks.x = element_blank())
 acc_time
 
-ggsave(filename = "Fatalities_by_Time.pdf", plot = acc_time, width = 6, height = 4,
+ggsave(filename = "Fatalities_by_Time.jpeg", plot = acc_time, width = 6, height = 4,
        units = "in")
 
 
-# Day of week graph - Jodie
+# Day of week graph
 day <- qplot(DAY_WEEK, data = df, geom = "bar", 
                   fill = I("darkblue"), 
                   color = I("greenyellow"), 
@@ -259,111 +252,107 @@ day <- day + theme(panel.grid.minor.x = element_blank())
 day <- day + theme(axis.ticks.x = element_blank())
 day
 
-ggsave(filename = "Fatalities_by_Day.pdf", plot = day, width = 6, height = 4,
+ggsave(filename = "Fatalities_by_Day.jpeg", plot = day, width = 6, height = 4,
        units = "in")
 
-# Time of Day of Crashes, Bike Direction, and Rural or Urban location - Jodie
+# Time of Day of Crashes, Bike Direction, and Rural or Urban location
+df2 <- subset(df, RUR_URB != "")
+df2 <- subset(df2, BIKEDIR != "")
+
 time_dir <- qplot(TIME, data = df2, geom = "bar", facets = . ~ BIKEDIR, fill=RUR_URB)
 time_dir <- time_dir + scale_fill_manual(name = "Location", values = c("darkblue", "greenyellow"))
 time_dir <- time_dir + scale_x_discrete(name = "Time of Day")
 time_dir <- time_dir + ylab("Number of Fatalities")
+time_dir <- time_dir + theme(axis.text.x = element_text(angle = 45))
 time_dir <- time_dir + theme(panel.grid.minor = element_blank())
 time_dir <- time_dir + theme(panel.grid.major.x = element_blank())
-time_dir <- time_dir + theme(axis.text.x = element_text(angle = 45))
+
 time_dir
 
-ggsave(filename = "Fatalities_by_Time_Dir_Urb.pdf", plot = time_dir, width = 6, height = 4,
+ggsave(filename = "Fatalities_by_Time_Dir_Urb.jpeg", plot = time_dir, width = 6, height = 4,
        units = "in")
 
-# Frequency Chart by Crash Type - Brian
-df3 <- df
-df3 <- subset(df3, BIKECTYPE != "Other")
-df3$BIKECTYPE <- factor(df3$BIKECTYPE, levels=c("Motorist Passing Error","Bicyclist Error","Bicyclist Turning Error","Motorist Turning Error","Motorist Error","Bicyclist Passing Error"))
-crashtype <- qplot(BIKECTYPE, data = df3, geom = "bar",fill = I("darkblue"), alpha = I(0.8))
-crashtype <- crashtype + ylab("Number of Fatalities")
-crashtype <- crashtype + scale_x_discrete(name = "Crash Type")
-crashtype <- crashtype + theme(axis.text.x = element_text(angle = 45))
-crashtype
 
-# Frequency Chart by Sex of Rider - Brian
-df5 <- df
-df5 <- subset(df5, PBSEX != "Unknown")
-df5 <- subset(df5, PBSEX != "Not Reported")
-df5 <- subset(df5, BIKEDIR != "")
+# Frequency Chart by Sex of Rider
+dfgender <- df
+dfgender <- subset(dfgender, PBSEX != "Unknown")
+dfgender <- subset(dfgender, PBSEX != "Not Reported")
+dfgender <- subset(dfgender, BIKEDIR != "")
 
-pbsex_dir <- qplot(TIME, data = df5, geom = "bar", facets = . ~ BIKEDIR, fill=PBSEX)
-pbsex_dir <- pbsex_dir + scale_fill_manual(name = "Sex", values = c("darkblue", "greenyellow"))
+pbsex_dir <- qplot(TIME, data = dfgender, geom = "bar", fill=PBSEX)
+pbsex_dir <- pbsex_dir + scale_fill_manual(name = "Gender", values = c("darkblue", "greenyellow"))
 pbsex_dir <- pbsex_dir + scale_x_discrete(name = "Time of Day")
 pbsex_dir <- pbsex_dir + ylab("Number of Fatalities")
 pbsex_dir <- pbsex_dir + theme(axis.text.x = element_text(angle = 45))
+pbsex_dir <- pbsex_dir + theme(panel.grid.minor = element_blank())
+pbsex_dir <- pbsex_dir + theme(panel.grid.major.x = element_blank())
 pbsex_dir
 
+ggsave(filename = "Time_Gender.jpeg", plot = pbsex_dir, width = 8, height = 6,
+       units = "in")
 
-#Weather - Sam
-df4 <- subset(df,df$WEATHER != "Not Reported")
-df4 <- subset(df4, df4$WEATHER !="Unknown" )
-df4$WEATHER <- factor(df4$WEATHER, levels=c("Normal","Cloudy","Rain","Snow","Fog"))
-qplot(WEATHER, data = df4, geom = "bar",fill = I("darkblue"), color = I("greenyellow"), alpha = I(0.8))
+# Frequency Chart by Crash Type
+dfcrashtype <- df
+dfcrashtype <- subset(dfcrashtype, BIKECTYPE != "Other")
+dfcrashtype$BIKECTYPE <- factor(dfcrashtype$BIKECTYPE, levels=c("Motorist Passing Error","Bicyclist Error","Bicyclist Turning Error","Motorist Turning Error","Motorist Error","Bicyclist Passing Error"))
+crashtype <- qplot(BIKECTYPE, data = dfcrashtype, geom = "bar",fill = I("darkblue"), color=I("greenyellow"), alpha = I(0.8))
+crashtype <- crashtype + ylab("Number of Fatalities")
+crashtype <- crashtype + scale_x_discrete(name = "Crash Type")
+crashtype <- crashtype + theme(panel.grid.minor = element_blank())
+crashtype <- crashtype + theme(panel.grid.major.x = element_blank())
+crashtype <- crashtype + theme(axis.text.x = element_text(angle = 45))
+crashtype <- crashtype + coord_flip()
+crashtype
 
-#Drunk Driving - Sam
-
-df1 <- df
-df1$DRUNK_DR <- as.factor(df1$DRUNK_DR)
-levels(df1$DRUNK_DR)[levels(df1$DRUNK_DR) == "0"] <- "Sober Driver"
-levels(df1$DRUNK_DR)[levels(df1$DRUNK_DR) != "Sober Driver"] <- "Drunk Driver"
-
-p <- qplot(DRUNK_DR, data = df1, geom = "bar", fill = BIKECTYPE)
-p <- p + theme(axis.text.x = element_text(angle = 45))
-p
-
-
-# Other plots evaluated, but not included in final report
-
-# Direction of traffic and urban vs rural
-#   Pick a color pallette 
-p <- qplot(BIKEDIR, data = df, geom = "bar", fill=RUR_URB)
-p <- p + theme(axis.text.x = element_text(angle = 45))
-p
-
-# KEEP THIS ONE
-# Time of Day, Direction of Travel, and Rural vs Urban
-# null the Traffic Way not in State Inventory and Not Reported
-qplot(HOUR, data = df, geom = "bar", binwidth=4, facets = . ~ BIKEDIR, fill=RUR_URB)
-
-
-
-##Use this to look at a certain bike crash type. the bike crash group is even more detail 
-p <- qplot(BIKECTYPE, data = df, geom = "bar")
-p <- p + theme(axis.text.x = element_text(angle = 45))
-p
-
+ggsave(filename = "crashtype.jpeg", plot = crashtype, width = 6, height = 4,
+       units = "in")
 
 # Type of Error, and Where the Crash Occurred
-p <- qplot(BIKECTYPE, data = df, geom = "bar",fill=BIKELOC)
-p  <- p + theme(legend.position = "bottom")
-p <- p + theme(axis.text.x = element_text(angle = 45))
+dflocation <- df
+dflocation <- subset(dflocation,dflocation$BIKELOC!="Non-Trafficway Location")
+dflocation <- subset(dflocation,dflocation$BIKELOC!="Unknown")
+
+p <- qplot(BIKELOC, data = dflocation, geom = "bar", fill=BIKECTYPE)
+p <- p + theme(legend.position = "bottom")
+p <- p + scale_fill_brewer(palette = "Blues", name = "Crash Type")
+p <- p + theme(panel.grid.minor.x = element_blank())
+p <- p + theme(panel.grid.major=element_blank())
+p <- p + xlab("Location of Crash")
 p
-
-# Time of Crash, Type of Error, and Where the Crash Occurred. different view
-qplot(HOUR, BIKECTYPE, data = df, geom = "point", color = BIKELOC)
-
-qplot(LONGITUD, LATITUDE, data = df, xlim = c(-125, -66),
-      ylim = c(25, 50), na.rm = TRUE)
-
-# Bike Direction and Rural or Urban location
-df2 <- subset(df, RUR_URB != "")
-df2 <- subset(df2, BIKEDIR != "")
-
-dir_loc <- qplot(BIKEDIR, data = df2, geom = "bar", fill=RUR_URB)
-dir_loc <- dir_loc + scale_fill_manual(name = "Location", values = c("darkblue", "greenyellow"))
-dir_loc <- dir_loc + scale_x_discrete(name = "Bike Direction")
-dir_loc <- dir_loc + ylab("Number of Fatalities")
-dir_loc <- dir_loc + theme(panel.grid.minor = element_blank())
-dir_loc <- dir_loc + theme(panel.grid.major.x = element_blank())
-dir_loc
-
-ggsave(filename = "Fatalities_by_Dir_Urb.pdf", plot = time_dir, width = 6, height = 4,
+ggsave(filename = "Location.jpeg", plot = p, width = 8, height = 6,
        units = "in")
+
+#Weather
+dfweather <- subset(df,df$WEATHER != "Not Reported")
+dfweather <- subset(dfweather, dfweather$WEATHER !="Unknown" )
+dfweather$WEATHER <- factor(dfweather$WEATHER, levels=c("Normal","Cloudy","Rain","Snow","Fog"))
+weather <- qplot(WEATHER, data = dfweather, geom = "bar",fill = I("darkblue"), alpha = I(0.8))
+weather <- weather + theme(panel.grid.major.x = element_blank())
+weather <- weather + theme(panel.grid.minor = element_blank())
+weather
+
+ggsave(filename = "Weather.jpeg", plot = weather, width = 6, height = 4,
+       units = "in")
+
+#Drunk Driving
+
+dfdd <- df
+dfdd$DRUNK_DR <- as.factor(dfdd$DRUNK_DR)
+levels(dfdd$DRUNK_DR)[levels(dfdd$DRUNK_DR) == "0"] <- "Sober Driver"
+levels(dfdd$DRUNK_DR)[levels(dfdd$DRUNK_DR) != "Sober Driver"] <- "Drunk Driver"
+
+dd_plot <- qplot(DRUNK_DR, data = dfdd, geom = "bar", fill = BIKECTYPE)
+dd_plot <- dd_plot + ggtitle("Crash Type by Driver")
+dd_plot <- dd_plot + theme(plot.title = element_text(face = "bold"))
+dd_plot <- dd_plot + scale_x_discrete(name = "Driver Type")
+dd_plot <- dd_plot + scale_fill_brewer(palette = "Blues", name = "Crash Type")
+dd_plot <- dd_plot + theme(panel.grid.minor.x = element_blank())
+dd_plot <- dd_plot + theme(panel.grid.major.x = element_blank())
+dd_plot
+
+ggsave(filename = "Crash Type By Driver.jpeg", plot = dd_plot, width = 6, height = 4,
+       units = "in")
+
 
 
 # Function - returns count of fatalities for input state
@@ -395,7 +384,7 @@ my_error_handling <- function(st){
   state
 }
 
-state_cnt <- function(state){
+state_cnt <- function(state=""){
   if((tolower(state) %in% tolower(df$STATE.x))=="FALSE"){
     state <- my_error_handling(state)
   }
@@ -413,3 +402,4 @@ state_cnt("Bob")
 state_cnt("California")
 state_cnt("Arizona")
 state_cnt("TX")
+state_cnt()
